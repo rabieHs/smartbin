@@ -23,3 +23,5 @@ class RegisterEvent extends AuthenticationEvent {
 }
 
 class GetUSerEvent extends AuthenticationEvent {}
+
+class SignOutUser extends AuthenticationEvent {}

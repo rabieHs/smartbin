@@ -38,7 +38,12 @@ class Trashes extends StatelessWidget {
                     progressColor: Colors.blueAccent,
                   ),
                   SizedBox(height: 10),
-                  CustomButton(text: "Add", onPressed: () {}),
+                  CustomButton(
+                      text: "Add",
+                      onPressed: () {
+                        BlocProvider.of<ContainerBloc>(context).add(
+                            AddContainerToFavouriteEvent(id: container.id));
+                      }),
                 ],
               ),
             ));
@@ -60,8 +65,22 @@ class Trashes extends StatelessWidget {
         centerTitle: true,
       ),
       backgroundColor: Colors.grey.shade200,
-      body:
-          BlocBuilder<ContainerBloc, ContainerState>(builder: (context, state) {
+      body: BlocConsumer<ContainerBloc, ContainerState>(
+          listener: (context, state) {
+        if (state is SuccessAddContainerState) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Container Added Successfully To Favourite"),
+            backgroundColor: Colors.green,
+          ));
+        } else if (state is ErrorAddContainerState) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(state.message),
+            backgroundColor: Colors.red,
+          ));
+        }
+      }, builder: (context, state) {
         print(state.runtimeType);
         if (state is LoadingGetNearbyContainersState) {
           return Center(

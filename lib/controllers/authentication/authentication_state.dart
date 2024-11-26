@@ -14,3 +14,7 @@ class AuthenticationFailure extends AuthenticationState {
 
   AuthenticationFailure({required this.message});
 }
+
+class LogoutSuccess extends AuthenticationState {}
+
+class LogoutFailure extends AuthenticationState {}

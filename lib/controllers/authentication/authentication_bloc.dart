@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:smart_bin/controllers/container/container_bloc.dart';
 import 'package:smart_bin/models/user.dart';
 import 'package:smart_bin/services/api.dart';
 
@@ -69,6 +70,15 @@ class AuthenticationBloc
         } else {
           emit(AuthenticationFailure(message: "Error registering user"));
         }
+      }
+    });
+
+    on<SignOutUser>((event, emit) async {
+      try {
+        await services.signUserOut();
+        emit(LogoutSuccess());
+      } catch (e) {
+        emit(LogoutFailure());
       }
     });
   }

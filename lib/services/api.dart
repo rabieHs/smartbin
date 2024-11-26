@@ -74,6 +74,17 @@ class Api {
     return containers;
   }
 
+  Future<void> signUserOut() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final id = prefs.getInt('id');
+
+      await prefs.remove('id');
+    } catch (e) {
+      throw Exception("Error Logout");
+    }
+  }
+
   Future<String> _hashPassword(String password) async {
     // Use SHA-256 to hash the password
     final bytes = utf8.encode(password);
