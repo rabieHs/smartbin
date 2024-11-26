@@ -23,7 +23,9 @@ class _MapsState extends State<Maps> {
     final map = BlocProvider.of<MapsBloc>(context);
     return Scaffold(
       body: BlocConsumer<MapsBloc, MapsState>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          print(state.runtimeType);
+        },
         builder: (context, state) {
           return Stack(
             children: [

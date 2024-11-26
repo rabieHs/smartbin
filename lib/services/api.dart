@@ -13,6 +13,7 @@ class Api {
       double longitude, double latitude) async {
     MySqlConnection connection = await Initializer.createConnection();
 
+    await initializeContainersTable();
     List<Trash> containers = [];
 
     // Define the radius for nearby containers (e.g., 10km)
@@ -61,6 +62,7 @@ class Api {
     final conn = await MySqlConnection.connect(settings);
     var results = await conn.query('SELECT * FROM containers');
     print("results: $results");
+    await initializeContainersTable();
     for (var row in results) {
       print(
           'Id: ${row['id']}, long: ${row['longitude']}, lat: ${row['latitude']}');
@@ -96,7 +98,7 @@ class Api {
     print("registering user");
     try {
       MySqlConnection connection = await Initializer.createConnection();
-
+      await initializeUsersTable();
       // Check for existing username
       String usernameCheck =
           "SELECT COUNT(*) as count FROM users WHERE username = ?";
@@ -147,7 +149,7 @@ class Api {
   Future<User> loginUser(String email, String password) async {
     try {
       MySqlConnection connection = await Initializer.createConnection();
-
+      await initializeUsersTable();
       // Hash the provided password for comparison
       String hashedPassword = await _hashPassword(password);
 
@@ -183,6 +185,7 @@ class Api {
   Future<User?> getUserById() async {
     print("getting user by id");
     MySqlConnection connection = await Initializer.createConnection();
+    await initializeUsersTable();
     final prefs = await SharedPreferences.getInstance();
     final id = prefs.getInt('id');
 
@@ -231,6 +234,50 @@ class Api {
     } catch (e) {
       print(e);
       throw Exception("Error initializing favorites table");
+    }
+  }
+
+  Future<void> initializeUsersTable() async {
+    try {
+      MySqlConnection connection = await Initializer.createConnection();
+
+      String createTableQuery = """
+    CREATE TABLE IF NOT EXISTS users (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      username VARCHAR(50) NOT NULL UNIQUE,
+      email VARCHAR(100) NOT NULL UNIQUE,
+      password VARCHAR(255) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """;
+
+      await connection.query(createTableQuery);
+      print("Users table initialized successfully");
+    } catch (e) {
+      print("Error initializing users table: $e");
+      throw Exception("Error initializing users table");
+    }
+  }
+
+  Future<void> initializeContainersTable() async {
+    try {
+      MySqlConnection connection = await Initializer.createConnection();
+
+      String createTableQuery = """
+    CREATE TABLE IF NOT EXISTS containers (
+      id VARCHAR(255) PRIMARY KEY,
+      longitude DOUBLE NOT NULL,
+      latitude DOUBLE NOT NULL,
+      volume DOUBLE NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """;
+
+      await connection.query(createTableQuery);
+      print("Containers table initialized successfully");
+    } catch (e) {
+      print("Error initializing containers table: $e");
+      throw Exception("Error initializing containers table");
     }
   }
 
